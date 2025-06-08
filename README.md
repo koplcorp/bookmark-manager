@@ -1,2 +1,0 @@
-# bookmark-manager
-Správce záložek
