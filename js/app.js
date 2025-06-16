@@ -205,38 +205,35 @@
     }
 
     document.addEventListener('keydown', (e) => {
-<<<<<<< HEAD
-        if (e.key === 'Escape') {
-            searchInput.value = '';
-            offset = 0;
-            currentQuery = '';
-            allData = [];
-            loadData();
-            return;
-        }
-    
-=======
->>>>>>> parent of 7b29ee4 (bfr escape)
-        const items = document.querySelectorAll('.bookmark-item');
-        if (items.length === 0) return;
-    
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            selectedIndex = Math.min(items.length - 1, selectedIndex + 1);
-            updateActiveItem();
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            selectedIndex = Math.max(0, selectedIndex - 1);
-            updateActiveItem();
-        } else if (e.key === 'Enter') {
-            if (selectedIndex >= 0 && selectedIndex < items.length) {
-                const url = items[selectedIndex].querySelector('a')?.href;
-                if (url) {
-                    window.open(url, '_blank');
-                }
+    if (e.key === 'Escape') {
+        searchInput.value = '';
+        offset = 0;
+        currentQuery = '';
+        allData = [];
+        loadData();
+        return;
+    }
+
+    const items = document.querySelectorAll('.bookmark-item');
+    if (items.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedIndex = Math.min(items.length - 1, selectedIndex + 1);
+        updateActiveItem();
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedIndex = Math.max(0, selectedIndex - 1);
+        updateActiveItem();
+    } else if (e.key === 'Enter') {
+        if (selectedIndex >= 0 && selectedIndex < items.length) {
+            const url = items[selectedIndex].querySelector('a')?.href;
+            if (url) {
+                window.open(url, '_blank');
             }
         }
-    });
+    }
+});
 
 
 
