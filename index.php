@@ -13,7 +13,7 @@ $db = new SQLite3('db/bookmarks.sqlite');
     <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <h1>Moje záložky</h1>
+    <h1>Moje záložky - přidáno v githubu desktop bequiet</h1>
 
     <input type="text" id="search" placeholder="Hledat záložky..." autocomplete="off" style="width: 100%; padding: 8px; margin-bottom: 20px;">
 
