@@ -48,7 +48,7 @@ $countResult = $db->querySingle("SELECT COUNT(*) FROM bookmarks");
     <button id="load-more" style="
         padding: 10px 20px;
         border-radius: 8px;
-        background-color: #007bff;
+        background-color: #AACCDD;
         color: white;
         border: none;
         font-size: 16px;
