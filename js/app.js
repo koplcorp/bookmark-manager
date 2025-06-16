@@ -205,20 +205,21 @@
     }
 
     document.addEventListener('keydown', (e) => {
-        
-
+<<<<<<< HEAD
         if (e.key === 'Escape') {
             searchInput.value = '';
             offset = 0;
             currentQuery = '';
             allData = [];
             loadData();
-            return; // 🛑 už dál nechceme řešit šipky nebo enter
+            return;
         }
-
+    
+=======
+>>>>>>> parent of 7b29ee4 (bfr escape)
         const items = document.querySelectorAll('.bookmark-item');
         if (items.length === 0) return;
-
+    
         if (e.key === 'ArrowDown') {
             e.preventDefault();
             selectedIndex = Math.min(items.length - 1, selectedIndex + 1);
