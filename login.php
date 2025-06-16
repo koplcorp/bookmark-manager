@@ -1,12 +1,17 @@
 ﻿<?php
+ini_set('session.cookie_lifetime', 86400); // 1 den
+session_set_cookie_params(86400);
 session_start();
 
-define('USERNAME', 'admin'); // Změň podle potřeby
-// Zahashuj si heslo jednou např. v PHP shellu:
-// echo password_hash('tvojeheslo', PASSWORD_DEFAULT);
-define('PASSWORD_HASH', '$2y$10$QrPSSA6EmqsAxUD2SMeHHu49UjmSg8molH3HltyHGGGajAdgYjy36'); // nahraď svým hashem zde je generator https://onlinephp.io/password-hash
+if (!empty($_SESSION['logged_in'])) {
+    // Prodloužení platnosti session cookie o 1 den při každém požadavku
+    setcookie(session_name(), session_id(), time() + 86400, "/");
+}
 
-$error = '';
+define('USERNAME', 'admin'); 
+define('PASSWORD_HASH', '$2y$10$QrPSSA6EmqsAxUD2SMeHHu49UjmSg8molH3HltyHGGGajAdgYjy36');
+
+header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
@@ -14,29 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($username === USERNAME && password_verify($password, PASSWORD_HASH)) {
         $_SESSION['logged_in'] = true;
-            header('Location: index.php'); // Zpět na hlavní stránku aplikace
-        exit;
+        // Cookie je nastavena výše, ale můžeš i tady explicitně obnovit platnost
+        setcookie(session_name(), session_id(), time() + 86400, "/");
+        echo json_encode(['success' => true]);
     } else {
-        $error = 'Neplatné uživatelské jméno nebo heslo.';
+        echo json_encode(['success' => false, 'error' => 'Neplatné jméno nebo heslo.']);
     }
+    exit;
 }
-?>
 
-<!DOCTYPE html>
-<html lang="cs">
-<head>
-    <meta charset="UTF-8" />
-    <title>Přihlášení</title>
-</head>
-<body>
-    <h1>Přihlášení</h1>
-    <?php if ($error): ?>
-        <p style="color:red;"><?= htmlspecialchars($error) ?></p>
-    <?php endif; ?>
-    <form method="post">
-        <input type="text" name="username" placeholder="Uživatelské jméno" required><br><br>
-        <input type="password" name="password" placeholder="Heslo" required><br><br>
-        <button type="submit">Přihlásit se</button>
-    </form>
-</body>
-</html>
+http_response_code(405);
+echo json_encode(['error' => 'Pouze POST je povolen.']);

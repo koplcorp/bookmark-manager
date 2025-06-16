@@ -1,6 +1,11 @@
 ﻿<?php
+ini_set('session.cookie_lifetime', 86400); // 1 den
 session_start();
-if (empty($_SESSION['logged_in'])) {
+
+if (!empty($_SESSION['logged_in'])) {
+    // Obnovit platnost cookie při aktivitě
+    setcookie(session_name(), session_id(), time() + 86400, "/");
+} else {
     header('HTTP/1.1 403 Forbidden');
     echo json_encode(['status' => 'error', 'message' => 'Přístup odepřen']);
     exit;

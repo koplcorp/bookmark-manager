@@ -3,7 +3,7 @@ body {
     max-width: 800px;
     margin: auto;
     padding: 20px;
-    background: #f4f4f4;
+    background: #E5E5E5;
 }
 
 form {
@@ -29,4 +29,88 @@ form {
 
 .category-box li {
     padding: 5px 0;
+}
+
+
+#search {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 50px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+#add_bookmark {
+    width: 38%;
+    padding: 12px 16px;
+    font-size: 20px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 18px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+
+
+.bookmark-item {
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  font-size: 18px;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bookmark-item a {
+  color: #000;               /* èerný odkaz */
+  text-decoration: none;
+}
+.bookmark-item a:hover {
+  text-decoration: underline;
+}
+
+
+.bookmark-item:hover {
+  background-color: #f5f5f5;
+  transition: background-color 0.2s ease;
+}
+
+
+.bookmark-item small {
+  color: #555;               /* URL nepatrnì šedá */
+  font-size: 14px;
+  display: block;
+  margin-top: 2px;
+}
+
+
+/* zalomeni URL adres na další øádek */
+.break-word {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-all;
 }

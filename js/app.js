@@ -2,97 +2,179 @@
     const form = document.getElementById('add-form');
     const categoriesDiv = document.getElementById('categories');
     const searchInput = document.getElementById('search');
+    const loadMoreBtn = document.getElementById('load-more');
+    const bookmarkCount = document.getElementById('bookmark-count');
 
-    function render(data) {
-    categoriesDiv.innerHTML = '';
-    data.forEach(b => {
-        console.log(b);  // <- Zjisti strukturu objektu
+    let limit = 10;
+    let offset = 0;
+    let loadingMore = false;
+    let allData = [];
+    let currentQuery = '';
 
-        const div = document.createElement('div');
-        div.style.padding = '10px';
-        div.style.marginBottom = '8px';
-        div.style.borderBottom = '1px solid #ccc';
-        div.style.fontSize = '18px';
-        div.style.display = 'flex';
-        div.style.alignItems = 'center';
-        div.style.justifyContent = 'space-between';
-
-        const favicon = b.favicon ? b.favicon : 'assets/default-favicon.png';
-        const img = document.createElement('img');
-        img.src = favicon;
-        img.width = 20;
-        img.height = 20;
-        img.style.marginRight = '10px';
-
-        const link = document.createElement('a');
-        link.href = b.url;
-        link.target = '_blank';
-        link.textContent = b.title;
-        link.style.textDecoration = 'none';
-        link.style.color = '#0066cc';
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = 'Smazat';
-        // Zde použij správný klíč ID podle console.logu
-        deleteBtn.setAttribute('data-id', b.id); 
-
-        deleteBtn.addEventListener('click', () => {
-            const id = deleteBtn.getAttribute('data-id');
-            fetch('api/delete_bookmark.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id })
-            }).then(() => loadData());
-        });
-
-        const leftDiv = document.createElement('div');
-        leftDiv.style.display = 'flex';
-        leftDiv.style.alignItems = 'center';
-
-        leftDiv.appendChild(img);
-        leftDiv.appendChild(link);
-
-        div.appendChild(leftDiv);
-        div.appendChild(deleteBtn);
-
-        categoriesDiv.appendChild(div);
-    });
-}
-
-    function loadData(query = '') {
-        fetch('search.php?q=' + encodeURIComponent(query))
-            .then(res => res.json())
-            .then(data => render(data));
+    // Přidána truncate funkce
+    function truncate(str, n) {
+        return (str.length > n) ? str.substr(0, n - 3) + '...' : str;
     }
 
-    form.addEventListener('submit', e => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        fetch('api/add_bookmark.php', {
-            method: 'POST',
-            body: formData
-        }).then(() => {
-            form.reset();
-            loadData(searchInput.value);
+    function render(data) {
+        categoriesDiv.innerHTML = '';
+        bookmarkCount.textContent = `Zobrazeno záložek: ${data.length}`;
+
+        data.forEach(b => {
+            const div = document.createElement('div');
+            div.className = 'bookmark-item';
+            div.style.cursor = 'pointer';
+            div.addEventListener('click', () => {
+                window.open(b.url, '_blank');
+            });
+
+            const favicon = b.favicon ? b.favicon : 'assets/default-favicon.png';
+            const img = document.createElement('img');
+            img.src = favicon;
+            img.width = 20;
+            img.height = 20;
+            img.style.marginRight = '10px';
+
+            const link = document.createElement('a');
+            link.href = b.url;
+            link.target = '_blank';
+            link.textContent = b.title;
+            link.style.display = 'block';
+            
+            // Neotevre se 2x odkaz
+            link.addEventListener('click', e => {
+                e.stopPropagation();
+            });
+
+            // Upravený element pro URL s truncate a zalamováním
+            const urlText = document.createElement('small');
+            urlText.className = 'break-word';                   // přidána třída pro zalamování
+            urlText.textContent = truncate(b.url, 70);          // ořez na 70 znaků
+            urlText.title = b.url;                               // tooltip s celou URL
+            urlText.style.display = 'block';
+            urlText.style.marginTop = '2px';
+
+            const leftDiv = document.createElement('div');
+            leftDiv.style.display = 'flex';
+            leftDiv.style.alignItems = 'center';
+            leftDiv.appendChild(img);
+
+            const textContainer = document.createElement('div');
+            textContainer.appendChild(link);
+            textContainer.appendChild(urlText);
+            leftDiv.appendChild(textContainer);
+
+            div.appendChild(leftDiv);
+
+            if (typeof isLoggedIn !== 'undefined' && isLoggedIn) {
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Upravit';
+                editBtn.setAttribute('data-id', b.id);
+                editBtn.style.marginLeft = '10px';
+
+                editBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // 🛑 Zabrání otevření odkazu
+                    const newTitle = prompt('Zadej nový název:', b.title);
+                    const newUrl = prompt('Zadej novou URL:', b.url);
+                    if (newTitle && newUrl) {
+                        fetch('api/edit_bookmark.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: b.id, title: newTitle, url: newUrl })
+                        }).then(() => {
+                            offset = 0;
+                            allData = [];
+                            loadData(currentQuery);
+                        });
+                    }
+                });
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Smazat';
+                deleteBtn.setAttribute('data-id', b.id);
+                deleteBtn.style.marginLeft = '10px';
+
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // 🛑 Zabrání otevření odkazu
+                    const id = deleteBtn.getAttribute('data-id');
+                    if (confirm('Opravdu chceš tuto záložku smazat?')) {
+                        fetch('api/delete_bookmark.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id })
+                        }).then(() => {
+                            offset = 0;
+                            allData = [];
+                            loadData(currentQuery);
+                        });
+                    }
+                });
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.style.display = 'flex';
+                actionsDiv.style.gap = '8px';
+                actionsDiv.appendChild(editBtn);
+                actionsDiv.appendChild(deleteBtn);
+                div.appendChild(actionsDiv);
+            }
+
+            categoriesDiv.appendChild(div);
         });
-    });
+    }
+
+    function loadData(query = '', append = false) {
+        loadingMore = true;
+        let url = `search.php?q=${encodeURIComponent(query)}`;
+        if (query.trim() === '') {
+            url += `&limit=${limit}&offset=${offset}`;
+        }
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (append) {
+                    allData = allData.concat(data);
+                } else {
+                    allData = data;
+                }
+                render(allData);
+                loadingMore = false;
+
+                if (query.trim() === '' && data.length === limit) {
+                    loadMoreBtn.style.display = 'block';
+                } else {
+                    loadMoreBtn.style.display = 'none';
+                }
+            });
+    }
+
+    if (form) {
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            fetch('api/add_bookmark.php', {
+                method: 'POST',
+                body: formData
+            }).then(() => {
+                form.reset();
+                offset = 0;
+                allData = [];
+                loadData(currentQuery);
+            });
+        });
+    }
 
     searchInput.addEventListener('input', () => {
-        loadData(searchInput.value);
+        offset = 0;
+        currentQuery = searchInput.value;
+        allData = [];
+        loadData(currentQuery, false);
     });
 
-    // ⭐ Mazání záložek po kliknutí na tlačítko
-    categoriesDiv.addEventListener('click', e => {
-        if (e.target.tagName === 'BUTTON' && e.target.hasAttribute('data-id')) {
-            const id = e.target.getAttribute('data-id');
-            if (confirm('Opravdu chceš tuto záložku smazat?')) {
-                fetch('api/delete_bookmark.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'id=' + encodeURIComponent(id)
-                }).then(res => res.json())
-                  .then(() => loadData(searchInput.value));
-            }
+    loadMoreBtn.addEventListener('click', () => {
+        if (!loadingMore) {
+            offset += limit;
+            loadData(currentQuery, true);
         }
     });
 

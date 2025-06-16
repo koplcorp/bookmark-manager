@@ -1,30 +1,41 @@
 <?php
 $db = new SQLite3('db/bookmarks.sqlite');
 
-$query = trim($_GET['q'] ?? '');
-if ($query === '') {
-    // Pokud není dotaz, vyber všechny záložky
-    $results = $db->query("SELECT * FROM bookmarks");
-} else {
-    // Rozdìlíme dotaz na slova
-    $words = preg_split('/\s+/', $query);
-
-    // Sestavíme SQL podmínku (title LIKE '%word1%' AND title LIKE '%word2%' ...)
-    $whereClauses = [];
-    foreach ($words as $word) {
-        $word = SQLite3::escapeString($word);
-        $whereClauses[] = "title LIKE '%$word%'";
-    }
-    $where = implode(' AND ', $whereClauses);
-
-    $sql = "SELECT * FROM bookmarks WHERE $where";
-    $results = $db->query($sql);
+function normalize($string) {
+    $string = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $string);
+    return strtolower($string);
 }
 
+$query = trim($_GET['q'] ?? '');
+$offset = intval($_GET['offset'] ?? 0);
+$limit = ($query === '') ? intval($_GET['limit'] ?? 10) : null;
+
 $bookmarks = [];
+$results = $db->query("SELECT * FROM bookmarks ORDER BY id DESC");
 while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
     $bookmarks[] = $row;
 }
 
+if ($query === '') {
+    // Bez dotazu: zobraz jen omezený poèet
+    $paged = array_slice($bookmarks, $offset, $limit);
+    header('Content-Type: application/json');
+    echo json_encode($paged);
+    exit;
+}
+
+// S dotazem: filtruj fulltextovì v PHP
+$words = preg_split('/\s+/', normalize($query));
+$filtered = array_filter($bookmarks, function ($item) use ($words) {
+    $normalizedTitle = normalize($item['title']);
+    foreach ($words as $word) {
+        if (strpos($normalizedTitle, $word) === false) {
+            return false;
+        }
+    }
+    return true;
+});
+
+// Vrátit všechny odpovídající výsledky
 header('Content-Type: application/json');
-echo json_encode($bookmarks);
+echo json_encode(array_values($filtered));
