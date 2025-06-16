@@ -17,6 +17,9 @@
     }
 
     function render(data) {
+        
+        selectedIndex = -1;
+        
         categoriesDiv.innerHTML = '';
         bookmarkCount.textContent = `Zobrazeno záložek: ${data.length}`;
 
@@ -179,4 +182,55 @@
     });
 
     loadData();
+
+
+
+
+
+
+
+
+    let selectedIndex = -1;
+
+    function updateActiveItem() {
+        const items = document.querySelectorAll('.bookmark-item');
+        items.forEach((el, idx) => {
+            if (idx === selectedIndex) {
+                el.classList.add('active');
+                el.scrollIntoView({ block: 'nearest' });
+            } else {
+                el.classList.remove('active');
+            }
+        });
+    }
+
+    document.addEventListener('keydown', (e) => {
+        const items = document.querySelectorAll('.bookmark-item');
+        if (items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            selectedIndex = Math.min(items.length - 1, selectedIndex + 1);
+            updateActiveItem();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            selectedIndex = Math.max(0, selectedIndex - 1);
+            updateActiveItem();
+        } else if (e.key === 'Enter') {
+            if (selectedIndex >= 0 && selectedIndex < items.length) {
+                const url = items[selectedIndex].querySelector('a')?.href;
+                if (url) {
+                    window.open(url, '_blank');
+                }
+            }
+        }
+    });
+
+
+
+
+
+
+
+
 });

@@ -87,7 +87,7 @@ button:hover {
 }
 
 .bookmark-item a {
-  color: #000;               /* èerný odkaz */
+  color: #000;               /* ï¿½ernï¿½ odkaz */
   text-decoration: none;
 }
 .bookmark-item a:hover {
@@ -102,16 +102,22 @@ button:hover {
 
 
 .bookmark-item small {
-  color: #555;               /* URL nepatrnì šedá */
+  color: #555;               /* URL nepatrnï¿½ ï¿½edï¿½ */
   font-size: 14px;
   display: block;
   margin-top: 2px;
 }
 
 
-/* zalomeni URL adres na další øádek */
+/* zalomeni URL adres na dalï¿½ï¿½ ï¿½ï¿½dek */
 .break-word {
     word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-all;
+}
+
+
+.bookmark-item.active {
+    background-color: #e0f0ff;
+    outline: 2px solid #007BFF;
 }
