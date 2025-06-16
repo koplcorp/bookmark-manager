@@ -23,7 +23,7 @@ $countResult = $db->querySingle("SELECT COUNT(*) FROM bookmarks");
 </head>
 <body>
 
-    <h1>Bookmark Manager - Moje záložky (Celkem <?= $countResult ?>) </h1>
+    <h1>aBookmark Manager - Moje záložky (Celkem <?= $countResult ?>) </h1>
 
 
     <input type="text" id="search" placeholder="Hledat záložky..." autocomplete="off" style="width: 100%; padding: 8px; margin-bottom: 20px;">
