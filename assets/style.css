@@ -3,7 +3,11 @@ body {
     max-width: 800px;
     margin: auto;
     padding: 20px;
-    background: #E5E5E5;
+// pro produkci   background: #E5E5E5;
+
+// pro TEST POZADI
+    background: #AACCDD;
+
 }
 
 form {
