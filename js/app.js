@@ -205,6 +205,17 @@
     }
 
     document.addEventListener('keydown', (e) => {
+        
+
+        if (e.key === 'Escape') {
+            searchInput.value = '';
+            offset = 0;
+            currentQuery = '';
+            allData = [];
+            loadData();
+            return; // 🛑 už dál nechceme řešit šipky nebo enter
+        }
+
         const items = document.querySelectorAll('.bookmark-item');
         if (items.length === 0) return;
 
