@@ -205,20 +205,18 @@
     }
 
     document.addEventListener('keydown', (e) => {
-        
-
         if (e.key === 'Escape') {
             searchInput.value = '';
             offset = 0;
             currentQuery = '';
             allData = [];
             loadData();
-            return; // 🛑 už dál nechceme řešit šipky nebo enter
+            return;
         }
-
+    
         const items = document.querySelectorAll('.bookmark-item');
         if (items.length === 0) return;
-
+    
         if (e.key === 'ArrowDown') {
             e.preventDefault();
             selectedIndex = Math.min(items.length - 1, selectedIndex + 1);
